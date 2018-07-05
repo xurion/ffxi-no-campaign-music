@@ -90,6 +90,7 @@ windower.register_event('incoming chunk', function(id, data)
   if id == 0x5F then
     local music_data = packets.parse('incoming', data)
     if music_data['Song ID'] == campaign_music_id then
+      windower.add_to_chat(8, 'Prevented campaign music.')
       return true
     end
   end
