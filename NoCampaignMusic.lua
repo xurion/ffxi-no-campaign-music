@@ -49,7 +49,7 @@ party_dungeon_id = 216
 campaign_active = false
 
 zone_music_map = {}
-zone_music_map[80] = { 254, 254, solo_id, party_id } --Southern San d'Oria
+zone_music_map[80] = { 254, 254, solo_id, party_id } --Southern San d'Oria [S]
 zone_music_map[81] = { 251, 251, solo_id, party_id } --East Ronfaure [S]
 zone_music_map[82] = { 0, 0, solo_id, party_id } --Jugner Forest [S]
 zone_music_map[83] = { 0, 0, solo_id, party_id } --Vunkerl Inlet [S]
