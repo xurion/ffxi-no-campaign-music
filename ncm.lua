@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'No Campaign Music'
 _addon.author = 'Dean James (Xurion of Bismarck)'
-_addon.version = '1.0.0'
+_addon.version = '2.0.0'
 _addon.commands = {'nocampaignmusic', 'ncm'}
 
 packets = require('packets')
