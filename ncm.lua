@@ -32,66 +32,131 @@ _addon.version = '1.0.0'
 _addon.commands = {'nocampaignmusic', 'ncm'}
 
 packets = require('packets')
+config = require('config')
 
-campaign_music_id = 247
-solo_combat_music_id = 101
-party_combat_music_id = 215
-solo_dungeon_combat_music_id = 115
-party_dungeon_combat_music_id = 216
-zone_resources = require('resources').zones
-
-zone_music_map = {
-    ['Beadeaux [S]'] = {44, solo_dungeon_combat_music_id, party_dungeon_combat_music_id}, --Where Lords Rule Not
-    ['Bastok Markets [S]'] = {180, solo_combat_music_id, party_combat_music_id}, --Thunder of the March
-    ['Batallia Downs [S]'] = {252, solo_combat_music_id, party_combat_music_id}, --Flowers on the Battlefield
-    ['Beaucedine Glacier [S]'] = {0, solo_combat_music_id, party_combat_music_id}, --No music
-    ['Castle Oztroja [S]'] = {44, solo_dungeon_combat_music_id, party_dungeon_combat_music_id}, --Where Lords Rule Not
-    ['Castle Zvahl Baileys [S]'] = {43, solo_dungeon_combat_music_id, party_dungeon_combat_music_id}, --Troubled Shadows
-    ['Castle Zvahl Keep [S]'] = {43, solo_dungeon_combat_music_id, party_dungeon_combat_music_id}, --Troubled Shadows
-    ["Crawlers' Nest [S]"] = {0, solo_dungeon_combat_music_id, party_dungeon_combat_music_id}, --No music
-    ['East Ronfaure [S]'] = {251, solo_combat_music_id, party_combat_music_id}, --Autumn Footfalls
-    ['Fort Karugo-Narugo [S]'] = {0, solo_combat_music_id, party_combat_music_id}, --No music
-    ['Garlaige Citadel [S]'] = {0, solo_dungeon_combat_music_id, party_dungeon_combat_music_id}, --No music
-    ['Grauberg [S]'] = {0, solo_combat_music_id, party_combat_music_id}, --No music
-    ['Jugner Forest [S]'] = {0, solo_combat_music_id, party_combat_music_id}, --No music
-    ['La Vaule [S]'] = {44, solo_dungeon_combat_music_id, party_dungeon_combat_music_id}, --Where Lords Rule Not
-    ['Meriphataud Mountains [S]'] = {0, solo_combat_music_id, party_combat_music_id}, --No music
-    ['North Gustaberg [S]'] = {253, solo_combat_music_id, party_combat_music_id}, --Echoes of a Zephyr
-    ['Pashhow Marshlands [S]'] = {0, solo_combat_music_id, party_combat_music_id}, --No music
-    ['Rolanberry Fields [S]'] = {252, solo_combat_music_id, party_combat_music_id}, --Flowers on the Battlefield
-    ['Sauromugue Champaign [S]'] = {252, solo_combat_music_id, party_combat_music_id}, --Flowers on the Battlefield
-    ["Southern San d'Oria [S]"] = {254, solo_combat_music_id, party_combat_music_id}, --Griffons Never Die
-    ['The Eldieme Necropolis [S]'] = {0, solo_dungeon_combat_music_id, party_dungeon_combat_music_id}, --No music
-    ['Vunkerl Inlet [S]'] = {0, solo_combat_music_id, party_combat_music_id}, --No music
-    ['West Sarutabaruta [S]'] = {141, solo_combat_music_id, party_combat_music_id}, --The Cosmic Wheel
-    ['Windurst Waters [S]'] = {182, solo_combat_music_id, party_combat_music_id}, --Stargazing
-    ['Xarcabard [S]'] = {42, solo_combat_music_id, party_combat_music_id}, --Snowdrift Waltz
+defaults = {
+    active = true
 }
+
+settings = config.load(defaults)
+
+campaign_id = 247
+solo_id = 101
+party_id = 215
+solo_dungeon_id = 115
+party_dungeon_id = 216
+
+campaign_active = false
+
+zone_music_map = {}
+zone_music_map[80] = { 254, 254, solo_id, party_id } --Southern San d'Oria
+zone_music_map[81] = { 251, 251, solo_id, party_id } --East Ronfaure [S]
+zone_music_map[82] = { 0, 0, solo_id, party_id } --Jugner Forest [S]
+zone_music_map[83] = { 0, 0, solo_id, party_id } --Vunkerl Inlet [S]
+zone_music_map[84] = { 252, 252, solo_id, party_id } --Batallia Downs [S]
+zone_music_map[85] = { 44, 44, solo_dungeon_id, party_dungeon_id } --La Vaule [S]
+zone_music_map[87] = { 180, 180, solo_id, party_id } --Bastok Markets [S]
+zone_music_map[88] = { 253, 253, solo_id, party_id } --North Gustaberg [S]
+zone_music_map[89] = { 0, 0, solo_id, party_id } --Grauberg [S]
+zone_music_map[90] = { 0, 0, solo_id, party_id } --Pashhow Marshlands [S]
+zone_music_map[91] = { 252, 252, solo_id, party_id } --Rolanberry Fields [S]
+zone_music_map[92] = { 44, 44, solo_dungeon_id, party_dungeon_id } --Beadeaux [S]
+zone_music_map[94] = { 182, 182, solo_id, party_id } --Windurst Waters [S]
+zone_music_map[95] = { 141, 141, solo_id, party_id } --West Sarutabaruta [S]
+zone_music_map[96] = { 0, 0, solo_id, party_id } --Fort Karugo-Narugo [S]
+zone_music_map[97] = { 0, 0, solo_id, party_id } --Meriphataud Mountains [S]
+zone_music_map[98] = { 252, 252, solo_id, party_id } --Sauromugue Champaign [S]
+zone_music_map[99] = { 44, 44, solo_dungeon_id, party_dungeon_id } --Castle Oztroja [S]
+zone_music_map[136] = { 0, 0, solo_id, party_id } --Beaucedine Glacier [S]
+zone_music_map[137] = { 42, 42, solo_id, party_id } --Xarcabard [S]
+zone_music_map[138] = { 43, 43, solo_dungeon_id, party_dungeon_id } --Castle Zvahl Baileys [S]
+zone_music_map[155] = { 43, 43, solo_dungeon_id, party_dungeon_id } --Castle Zvahl Keep [S]
+zone_music_map[164] = { 0, 0, solo_dungeon_id, party_dungeon_id } --Garlaige Citadel [S]
+zone_music_map[171] = { 0, 0, solo_dungeon_id, party_dungeon_id } --Crawlers' Nest [S]
+zone_music_map[175] = { 0, 0, solo_dungeon_id, party_dungeon_id } --The Eldieme Necropolis [S]
 
 windower.register_event('incoming chunk', function(id, data)
     if id == 0x00A then --Zone update (zoned in)
         local parsed = packets.parse('incoming', data)
-        local zone_name = zone_resources[parsed['Zone']].en
-        if parsed['Day Music'] == campaign_music_id and zone_music_map[zone_name] then
-            local zone_music_id = zone_music_map[zone_name][1]
-            local zone_solo_battle_music_id = zone_music_map[zone_name][2]
-            local zone_party_battle_music_id = zone_music_map[zone_name][3]
+        if parsed['Day Music'] == campaign_id and zone_music_map[parsed.Zone] then
+            campaign_active = true
+            if not settings.active then return end
 
-            parsed['Day Music'] = zone_music_id
-            parsed['Night Music'] = zone_music_id
-            parsed['Solo Combat Music'] = zone_solo_battle_music_id
-            parsed['Party Combat Music'] = zone_party_battle_music_id
+            parsed['Day Music'] = zone_music_map[parsed.Zone][1]
+            parsed['Night Music'] = zone_music_map[parsed.Zone][1]
+            parsed['Solo Combat Music'] = zone_music_map[parsed.Zone][2]
+            parsed['Party Combat Music'] = zone_music_map[parsed.Zone][3]
 
             windower.add_to_chat(8, 'Prevented campaign music.')
             return packets.build(parsed)
         end
-    end
-
-    if id == 0x05F then --Music update (campaign started)
+    elseif id == 0x05F then --Music update (campaign possibly started)
         local parsed = packets.parse('incoming', data)
-        if parsed['Song ID'] == campaign_music_id then
-            windower.add_to_chat(8, 'Prevented campaign music.')
-            return true
+        if parsed['Song ID'] == campaign_id then
+            campaign_active = true
+            if not settings.active then return end
+
+            local info = windower.ffxi.get_info()
+            if not zone_music_map[info.zone] then return end
+
+            if parsed['BGM Type'] == 0 then --only log to the chat once
+                windower.add_to_chat(8, 'Prevented campaign music.')
+            end
+
+            parsed['Song ID'] = zone_music_map[info.zone][parsed['BGM Type'] + 1]
+            return packets.build(parsed)
         end
+    end
+end)
+
+commands = {}
+
+commands.on = function()
+    settings.active = true
+    settings:save()
+    windower.add_to_chat(8, 'Campaign music will now be blocked.')
+    local info = windower.ffxi.get_info()
+
+    if campaign_active and zone_music_map[info.zone] then
+        for i = 0, 3 do
+            packets.inject(packets.new('incoming', 0x05F, {
+                ['BGM Type'] = i,
+                ['Song ID'] = zone_music_map[info.zone][i + 1],
+            }))
+        end
+    end
+end
+
+commands.off = function()
+    settings.active = false
+    settings:save()
+    windower.add_to_chat(8, 'Campaign music will no longer be blocked.')
+    local info = windower.ffxi.get_info()
+
+    if campaign_active and zone_music_map[info.zone] then
+        --Set all music to be campaign
+        for i = 0, 3 do
+            packets.inject(packets.new('incoming', 0x05F, {
+                ['BGM Type'] = i,
+                ['Song ID'] = campaign_id,
+            }))
+        end
+    end
+end
+
+commands.help = function()
+    windower.add_to_chat(8, 'No Campaign Music:')
+    windower.add_to_chat(8, '  //ncm on - starts blocking campaign music (on by default)')
+    windower.add_to_chat(8, '  //ncm off - stops blocking campaign music')
+    windower.add_to_chat(8, '  //ncm help - shows this help')
+end
+
+windower.register_event('addon command', function(command)
+    command = command and command:lower() or 'help'
+
+    if commands[command] then
+        commands[command]()
+    else
+        commands.help()
     end
 end)
