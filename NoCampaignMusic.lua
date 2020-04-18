@@ -88,10 +88,6 @@ windower.register_event('incoming chunk', function(id, data)
             parsed['Solo Combat Music'] = zone_music_map[parsed.Zone][2]
             parsed['Party Combat Music'] = zone_music_map[parsed.Zone][3]
 
-            if settings.notification then
-                windower.add_to_chat(8, 'Prevented campaign music.')
-            end
-
             return packets.build(parsed)
         end
     elseif id == 0x05F then --Music update (campaign possibly started)
@@ -101,7 +97,7 @@ windower.register_event('incoming chunk', function(id, data)
             campaign_active = true
             if not settings.active or not zone_music_map[info.zone] then return end
 
-            if settings.notification and parsed['BGM Type'] == 0 then --only log to the chat once
+            if settings.notifications and parsed['BGM Type'] == 0 then --only log to the chat once
                 windower.add_to_chat(8, 'Prevented campaign music.')
             end
 
@@ -150,7 +146,8 @@ end
 
 commands.notify = function()
     settings.notifications = not settings.notifications
-    windower.add_to_chat(8, 'Campaign notifications: ' .. settings.notifications)
+    settings:save()
+    windower.add_to_chat(8, 'Campaign notifications: ' .. tostring(settings.notifications))
 end
 
 commands.help = function()
