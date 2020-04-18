@@ -35,7 +35,7 @@ packets = require('packets')
 config = require('config')
 
 defaults = {
-    notifications = false,
+    Notifications = false,
 }
 
 settings = config.load(defaults)
@@ -95,7 +95,7 @@ windower.register_event('incoming chunk', function(id, data)
             campaign_active = true
             if not zone_music_map[info.zone] then return end
 
-            if settings.notifications and parsed['BGM Type'] == 0 then --only log to the chat once
+            if settings.Notifications and parsed['BGM Type'] == 0 then --only log to the chat once
                 windower.add_to_chat(8, 'Prevented campaign music.')
             end
 
@@ -110,9 +110,9 @@ end)
 commands = {}
 
 commands.notify = function()
-    settings.notifications = not settings.notifications
+    settings.Notifications = not settings.Notifications
     settings:save()
-    windower.add_to_chat(8, 'Campaign notifications: ' .. tostring(settings.notifications))
+    windower.add_to_chat(8, 'Campaign notifications: ' .. tostring(settings.Notifications))
 end
 
 commands.help = function()
