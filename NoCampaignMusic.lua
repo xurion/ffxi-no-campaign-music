@@ -76,32 +76,35 @@ zone_music_map[171] = { 0, 0, solo_dungeon_id, party_dungeon_id } --Crawlers' Ne
 zone_music_map[175] = { 0, 0, solo_dungeon_id, party_dungeon_id } --The Eldieme Necropolis [S]
 
 windower.register_event('incoming chunk', function(id, data)
-    if id == 0x00A then --Zone update (zoned in)
-        local parsed = packets.parse('incoming', data)
-        if parsed['Day Music'] == campaign_id and zone_music_map[parsed.Zone] then
+    if id ~= 0x00A and id ~= 0x05F then return end
+
+    local parsed = packets.parse('incoming', data)
+    local zone_music = zone_music_map[parsed['Zone'] or windower.ffxi.get_info().zone]
+
+    if id == 0x00A then  --Zone update (zoned in)
+        if parsed['Day Music'] == campaign_id and zone_music then
             campaign_active = true
 
-            parsed['Day Music'] = zone_music_map[parsed.Zone][1]
-            parsed['Night Music'] = zone_music_map[parsed.Zone][1]
-            parsed['Solo Combat Music'] = zone_music_map[parsed.Zone][2]
-            parsed['Party Combat Music'] = zone_music_map[parsed.Zone][3]
+            parsed['Day Music'] = zone_music[1]
+            parsed['Night Music'] = zone_music[2]
+            parsed['Solo Combat Music'] = zone_music[3]
+            parsed['Party Combat Music'] = zone_music[4]
 
             return packets.build(parsed)
         end
-    elseif id == 0x05F then --Music update (campaign possibly started)
-        local parsed = packets.parse('incoming', data)
+    else --Music update (campaign possibly started/finished)
         local info = windower.ffxi.get_info()
         if parsed['Song ID'] == campaign_id then
             campaign_active = true
-            if not zone_music_map[info.zone] then return end
+            if not zone_music then return end
 
             if settings.Notifications and parsed['BGM Type'] == 0 then --only log to the chat once
                 windower.add_to_chat(8, 'Prevented campaign music.')
             end
 
-            parsed['Song ID'] = zone_music_map[info.zone][parsed['BGM Type'] + 1]
+            parsed['Song ID'] = zone_music[parsed['BGM Type'] + 1]
             return packets.build(parsed)
-        elseif parsed['Song ID'] == zone_music_map[info.zone][parsed['BGM Type'] + 1] then
+        elseif parsed['Song ID'] == zone_music[parsed['BGM Type'] + 1] then
             campaign_active = false
         end
     end
@@ -117,8 +120,7 @@ end
 
 commands.help = function()
     windower.add_to_chat(8, 'No Campaign Music:')
-    windower.add_to_chat(8, '  //ncm on - starts blocking campaign music (on by default)')
-    windower.add_to_chat(8, '  //ncm off - stops blocking campaign music')
+    windower.add_to_chat(8, '  //ncm notify - toggles campaign notifications (default false)')
     windower.add_to_chat(8, '  //ncm help - shows this help')
 end
 
