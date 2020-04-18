@@ -35,7 +35,6 @@ packets = require('packets')
 config = require('config')
 
 defaults = {
-    active = true,
     notifications = false,
 }
 
@@ -81,7 +80,6 @@ windower.register_event('incoming chunk', function(id, data)
         local parsed = packets.parse('incoming', data)
         if parsed['Day Music'] == campaign_id and zone_music_map[parsed.Zone] then
             campaign_active = true
-            if not settings.active then return end
 
             parsed['Day Music'] = zone_music_map[parsed.Zone][1]
             parsed['Night Music'] = zone_music_map[parsed.Zone][1]
@@ -95,7 +93,7 @@ windower.register_event('incoming chunk', function(id, data)
         local info = windower.ffxi.get_info()
         if parsed['Song ID'] == campaign_id then
             campaign_active = true
-            if not settings.active or not zone_music_map[info.zone] then return end
+            if not zone_music_map[info.zone] then return end
 
             if settings.notifications and parsed['BGM Type'] == 0 then --only log to the chat once
                 windower.add_to_chat(8, 'Prevented campaign music.')
@@ -110,39 +108,6 @@ windower.register_event('incoming chunk', function(id, data)
 end)
 
 commands = {}
-
-commands.on = function()
-    settings.active = true
-    settings:save()
-    windower.add_to_chat(8, 'Campaign music will now be blocked.')
-    local info = windower.ffxi.get_info()
-
-    if campaign_active and zone_music_map[info.zone] then
-        for i = 0, 3 do
-            packets.inject(packets.new('incoming', 0x05F, {
-                ['BGM Type'] = i,
-                ['Song ID'] = zone_music_map[info.zone][i + 1],
-            }))
-        end
-    end
-end
-
-commands.off = function()
-    settings.active = false
-    settings:save()
-    windower.add_to_chat(8, 'Campaign music will no longer be blocked.')
-    local info = windower.ffxi.get_info()
-
-    if campaign_active and zone_music_map[info.zone] then
-        --Set all music to be campaign
-        for i = 0, 3 do
-            packets.inject(packets.new('incoming', 0x05F, {
-                ['BGM Type'] = i,
-                ['Song ID'] = campaign_id,
-            }))
-        end
-    end
-end
 
 commands.notify = function()
     settings.notifications = not settings.notifications
